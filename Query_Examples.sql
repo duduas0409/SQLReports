@@ -38,7 +38,8 @@ represents a single item from an order.
 
 */
 
-/* For each product, display name (ProductName), the name of the category
+/* 
+For each product, display name (ProductName), the name of the category
 it belongs to (CategoryName), quantity per unit (QuantityPerUnit), the unit
 price (UnitPrice), and the number of units in stock (UnitsInStock).
 Order the results by unit price.
@@ -69,7 +70,8 @@ FROM Products P JOIN Suppliers S
 GROUP BY S.SupplierID, S.CompanyName
 HAVING COUNT(*) > 3;
 
-/* Show the list of products purchased in the order with ID 10250.
+/* 
+Show the list of products purchased in the order with ID 10250.
 Show product name, the quantity of the product ordered (Quantity), the unit
 price (UnitPrice from OrderItems table), the discount (Discount), and the
 OrderDate. Order the items by product name. */
@@ -82,3 +84,74 @@ INNER JOIN orders as o
   ON oi.orderid = o.orderid
 WHERE o.orderid = 10250
 ORDER BY p.productname;
+
+
+/* Show the following information related to all items with OrderID = 10248: 
+Product name, the unit price, the quantity, and the name of the supplier's 
+company (as SupplierName).
+*/
+
+SELECT
+  ProductName,
+  OI.UnitPrice,
+  OI.Quantity,
+  CompanyName AS SupplierName
+FROM OrderItems OI
+JOIN Products P 
+  ON OI.ProductID = P.ProductID
+JOIN Suppliers S
+  ON S.SupplierID = P.SupplierID
+WHERE OI.OrderID = 10248;
+
+/* Count the number of employees hired in 2013. 
+Name the result NumberOfEmployees.
+*/
+
+
+SELECT COUNT(EmployeeID) as NumberOfEmployees
+FROM Employees
+WHERE HireDate Between '2013-01-01' AND '2013-12-31';
+
+/* Show each SupplierID alongside the CompanyName and
+the number of products they supply
+(aslias ProductsCount column). */
+
+SELECT S.SupplierID,
+  S.CompanyName,
+  Count(P.ProductID) as ProductsCount
+ From Products P
+ INNER JOIN Suppliers S
+ ON P.SupplierID = S.SupplierID
+ GROUP BY S.SupplierID, S.CompanyName;
+
+ /* The Northwind store offers its customers discounts 
+ for some products. Find the Total price and price after discount
+ for the order with ID 10250.
+ */
+
+ SELECT 
+  SUM(UnitPrice * Quantity) AS TotalPrice, 
+  SUM(UnitPrice * Quantity * (1 - Discount)) AS TotalPriceAfterDiscount
+FROM Orders O
+JOIN OrderItems OI
+  ON O.OrderID = OI.OrderID
+WHERE O.OrderID = 10250;
+
+
+/* Show the number of orders processed by each employee.
+Show the following columns: EmployeeID, FirstName, LastName,
+and the number of orders processed as OrdersCount. */
+
+SELECT
+  E.EmployeeID,
+  E.FirstName,
+  E.LastName,
+  COUNT(*) AS OrdersCount
+FROM Orders O
+JOIN Employees E
+  ON E.EmployeeID = O.EmployeeID
+GROUP BY E.EmployeeID,
+  E.FirstName,
+  E.LastName;
+
+  
