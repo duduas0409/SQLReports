@@ -225,6 +225,130 @@ INNER JOIN Suppliers S
   ON P.SupplierID = S.SupplierID
 GROUP BY S.SupplierID, S.CompanyName;
 
+/* How many distinct products are there in all orders shipped to France? Name the result DistinctProducts.
+*/
+
+SELECT
+  COUNT(DISTINCT OI.ProductID) AS DistinctProducts
+FROM Orders O
+JOIN OrderItems OI
+  ON O.OrderID = OI.OrderID
+WHERE ShipCountry = N'France';
+
+/* Which employees processed the highest -value orders made during June and July 2016?
+For each employee, compute the total order value before discount from all orders processed by this employee between 5 July 2016 and 31 July 2016. Show the following columns: FirstName, LastName, and SumOrders. 
+Sort the results by SumOrders in descending order.
+*/
+
+SELECT
+  E.FirstName,
+  E.LastName, 
+  SUM(UnitPrice * Quantity) AS SumOrders
+FROM Orders O
+JOIN OrderItems OI
+  ON O.OrderID = OI.OrderID
+JOIN Employees E
+  ON E.EmployeeID = O.EmployeeID
+WHERE OrderDate >= '2016-07-05' AND OrderDate < '2016-08-01'
+GROUP BY E.EmployeeID,
+  E.FirstName,
+  E.LastName
+ORDER BY SumOrders DESC;
+
+/* Show the FirstName, LastName, HireDate, and Experience columns for each employee. The Experience column should display the following values:
+'junior' for employees hired after January, 1st 2014.
+'middle' for employees hired after January, 1st 2013 but before January, 1st 2014.
+'senior' for employees hired on or before January, 1st 2013.
+*/
+
+
+SELECT
+  FirstName,
+  LastName,
+  HireDate,
+  CASE
+    WHEN HireDate > '2014-01-01' THEN 'junior'
+    WHEN HireDate > '2013-01-01' THEN 'middle'
+    ELSE 'senior'
+  END AS Experience
+FROM Employees;
+
+
+/* create a report that will divide all products into vegetarian and non-vegetarian categories. For each product, show the following columns:
+
+ProductName
+CategoryName
+DietType:
+N'Non-vegetarian' for products from the categories N'Meat/Poultry' and N'Seafood'.
+N'Vegetarian' for any other category. */
+
+SELECT
+  ProductName,
+  CategoryName,
+  CASE
+    WHEN CategoryName IN (N'Meat/Poultry', N'Seafood') THEN N'Non-vegetarian'
+    ELSE N'Vegetarian'
+  END AS DietType
+FROM Categories C
+JOIN Products P
+  ON C.CategoryID = P.CategoryID;
+
+
+/* Create a report that shows the number of products supplied from a specific continent. Display two columns: SupplierContinent and ProductCount. The SupplierContinent column should have the following values:
+
+N'North America' for products supplied from N'USA' and N'Canada'.
+N'Asia' for products from N'Japan' and N'Singapore'.
+N'Other' for other countries.
+*/
+
+SELECT 
+  CASE 
+    WHEN Country IN (N'USA', N'Canada') THEN N'North America'
+    WHEN Country IN (N'Japan', N'Singapore') THEN N'Asia'
+    ELSE N'Other'
+    END AS SupplierContinent,
+  COUNT(*) AS ProductCount
+  FROM Products P
+  JOIN Suppliers S
+  ON P.SupplierID = S.SupplierID
+  GROUP BY
+  CASE 
+    WHEN Country IN (N'USA', N'Canada') THEN N'North America'
+    WHEN Country IN (N'Japan', N'Singapore') THEN N'Asia'
+    ELSE N'Other'
+  END;
+
+
+ /* How many customers are represented by owners (ContactTitle = N'Owner'), and how many arent? Show two columns with appropriate values: RepresentedByOwner and NotRepresentedByOwner.
+*/
+
+SELECT 
+  COUNT(CASE
+    WHEN ContactTitle = N'Owner' THEN CustomerID
+  END) AS RepresentedByOwner,
+  COUNT(CASE
+    WHEN ContactTitle != N'Owner' THEN CustomerID
+  END) AS NotRepresentedByOwner
+FROM Customers;
+
+/*How many orders have been processed by employees in the WA region, and how many by employees in other regions? Show two columns with their respective counts: OrdersWAEmployees and OrdersNotWAEmployees.
+*/
+
+SELECT
+COUNT( CASE WHEN REGION = N'WA' THEN OrderID END) AS OrdersWAEmployees,
+COUNT( CASE WHEN REGION != N'WA' THEN OrderID END) AS OrdersNotWAEmployees
+FROM Employees e
+JOIN Orders
+ON e.EmployeeID = Orders.EmployeeID
+
+
+
+
+
+
+
+
+
 
 
 
