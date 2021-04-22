@@ -3,30 +3,30 @@
 
 
 Employees table:
-It stores information about the people employed at Northwind.
+Stores information about the people employed at Northwind.
 Each employee has:
 
-A unique ID (EmployeeID).
-A first and last name (FirstName and LastName).
+A unique ID (Employee_ID).
+A first and last name (First_Name and Last_Name).
 A professional title (Title) ect.
 
 Customers table:
-Each customer has a unique CustomerID, which is a five-letter abbreviation of the full company name stored in the CompanyName column.
-There are also columns related to the contact person (ContactName and ContactTitle) and some related to the customer's address and fax number.
+Each customer has a unique Customer_ID, which is a five-letter abbreviation of the full company name stored in the Company_Name column.
+There are also columns related to the contact person (Contact_Name and Contact_Title) and some related to the customer's address and fax number.
 
 Products table stores information about products sold at the Northwind store.
-Each product has a unique ProductID and a ProductName. Each product is supplied by a single supplier (SupplierID) and belongs to a single category (CategoryID).
-Each product also has a certain UnitPrice. The Discontinued column contains either a 0 (available in store) or a 1 (discontinued) that reflects the
+Each product has a unique Product_ID and a Product_Name. Each product is supplied by a single supplier (Supplier_ID) and belongs to a single category (Category_ID).
+Each product also has a certain Unit_Price. The Discontinued column contains either a 0 (available in store) or a 1 (discontinued) that reflects the
 current availability of that product.
 
 Products are organized into categories. The information about categories is stored in the Categories table. Each category has a unique ID and a
-CategoryName. There is also a short Description.
+Category_Name. There is also a short Description.
 
 
-Orders table contains general information about an order: the OrderID, CustomerID, and EmployeeID related to that sale. There are also timestamp
-columns (OrderDate and ShippedDate) and many columns related to the shipment process.
+Orders table contains general information about an order: the Order_ID, Customer_ID, and Employee_ID related to that sale. There are also timestamp
+columns (Order_Date and Shipped_Date) and many columns related to the shipment process.
 
-The OrderItems table contains information about order items. Each row represents a single item from an order.
+The Order_Items table contains information about order items. Each row represents a single item from an order.
 */
 
 
@@ -217,23 +217,23 @@ ProductsSuppliedCount (the number of products supplied by that company).
 */
 
 SELECT 
-  S.SupplierID,
-  S.CompanyName,
-  COUNT(P.ProductID) as ProductsSuppliedCount
+  S.Supplier_ID,
+  S.Company_Name,
+  COUNT(P.Product_ID) as products_supplied_count
 FROM Products P
-INNER JOIN Suppliers S
-  ON P.SupplierID = S.SupplierID
-GROUP BY S.SupplierID, S.CompanyName;
+RIGHT JOIN Suppliers S
+  ON P.Supplier_ID = S.Supplier_ID
+GROUP BY S.Supplier_ID, S.Company_Name;
 
 /* How many distinct products are there in all orders shipped to France? Name the result DistinctProducts.
 */
 
 SELECT
-  COUNT(DISTINCT OI.ProductID) AS DistinctProducts
+  COUNT(DISTINCT OI.Product_ID) AS Distinct_Products
 FROM Orders O
-JOIN OrderItems OI
-  ON O.OrderID = OI.OrderID
-WHERE ShipCountry = N'France';
+JOIN Order_Items OI
+  ON O.Order_ID = OI.Order_ID
+WHERE Ship_Country = 'France';
 
 /* Which employees processed the highest -value orders made during June and July 2016?
 For each employee, compute the total order value before discount from all orders processed by this employee between 5 July 2016 and 31 July 2016. Show the following columns: FirstName, LastName, and SumOrders. 
@@ -241,19 +241,19 @@ Sort the results by SumOrders in descending order.
 */
 
 SELECT
-  E.FirstName,
-  E.LastName, 
-  SUM(UnitPrice * Quantity) AS SumOrders
+  E.First_Name,
+  E.Last_Name, 
+  SUM(Unit_Price * Quantity) AS Sum_Orders
 FROM Orders O
-JOIN OrderItems OI
-  ON O.OrderID = OI.OrderID
+JOIN Order_Items OI
+  ON O.Order_ID = OI.Order_ID
 JOIN Employees E
-  ON E.EmployeeID = O.EmployeeID
-WHERE OrderDate >= '2016-07-05' AND OrderDate < '2016-08-01'
-GROUP BY E.EmployeeID,
-  E.FirstName,
-  E.LastName
-ORDER BY SumOrders DESC;
+  ON E.Employee_ID = O.Employee_ID
+WHERE Order_Date >= '2016-07-05' AND Order_Date < '2016-08-01'
+GROUP BY E.Employee_ID,
+  E.First_Name,
+  E.Last_Name
+ORDER BY Sum_Orders DESC;
 
 /* Show the FirstName, LastName, HireDate, and Experience columns for each employee. The Experience column should display the following values:
 'junior' for employees hired after January, 1st 2014.
@@ -340,6 +340,9 @@ COUNT( CASE WHEN REGION != N'WA' THEN OrderID END) AS OrdersNotWAEmployees
 FROM Employees e
 JOIN Orders
 ON e.EmployeeID = Orders.EmployeeID
+                             
+                             
+                             
 
 
 
