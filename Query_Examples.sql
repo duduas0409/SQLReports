@@ -263,12 +263,12 @@ ORDER BY Sum_Orders DESC;
 
 
 SELECT
-  FirstName,
-  LastName,
-  HireDate,
+  First_Name,
+  Last_Name,
+  Hire_Date,
   CASE
-    WHEN HireDate > '2014-01-01' THEN 'junior'
-    WHEN HireDate > '2013-01-01' THEN 'middle'
+    WHEN Hire_Date > '2014-01-01' THEN 'junior'
+    WHEN Hire_Date > '2013-01-01' THEN 'middle'
     ELSE 'senior'
   END AS Experience
 FROM Employees;
