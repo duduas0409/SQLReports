@@ -283,15 +283,15 @@ N'Non-vegetarian' for products from the categories N'Meat/Poultry' and N'Seafood
 N'Vegetarian' for any other category. */
 
 SELECT
-  ProductName,
-  CategoryName,
-  CASE
-    WHEN CategoryName IN (N'Meat/Poultry', N'Seafood') THEN N'Non-vegetarian'
-    ELSE N'Vegetarian'
-  END AS DietType
-FROM Categories C
-JOIN Products P
-  ON C.CategoryID = P.CategoryID;
+ product_name,
+ category_name,
+CASE
+  WHEN category_name IN ('Meat/Poultry', 'Seafood') THEN 'Non-vegetarian'
+  ELSE 'Vegetarian'
+END AS diet_type
+FROM products p
+JOIN categories c
+ON c.category_id = p.category_id
 
 
 /* Create a report that shows the number of products supplied from a specific continent. Display two columns: SupplierContinent and ProductCount. The SupplierContinent column should have the following values:
@@ -302,20 +302,20 @@ N'Other' for other countries.
 */
 
 SELECT 
-  CASE 
-    WHEN Country IN (N'USA', N'Canada') THEN N'North America'
-    WHEN Country IN (N'Japan', N'Singapore') THEN N'Asia'
-    ELSE N'Other'
-    END AS SupplierContinent,
-  COUNT(*) AS ProductCount
-  FROM Products P
-  JOIN Suppliers S
-  ON P.SupplierID = S.SupplierID
-  GROUP BY
-  CASE 
-    WHEN Country IN (N'USA', N'Canada') THEN N'North America'
-    WHEN Country IN (N'Japan', N'Singapore') THEN N'Asia'
-    ELSE N'Other'
+  CASE
+    WHEN country IN ('USA', 'Canada') THEN 'North America'
+    WHEN country IN ('Japan', 'Singapore') THEN 'Asia'
+    ELSE 'Other'
+  END AS supplier_continent,
+  COUNT(*) AS product_count
+FROM products p
+JOIN suppliers s
+  ON p.supplier_id = s.supplier_id
+GROUP BY
+  CASE
+    WHEN country IN ('USA', 'Canada') THEN 'North America'
+    WHEN country IN ('Japan', 'Singapore') THEN 'Asia'
+    ELSE 'Other'
   END;
 
 
@@ -324,22 +324,47 @@ SELECT
 
 SELECT 
   COUNT(CASE
-    WHEN ContactTitle = N'Owner' THEN CustomerID
-  END) AS RepresentedByOwner,
+    WHEN contact_title = 'Owner' THEN customer_id
+  END) AS represented_by_owner,
   COUNT(CASE
-    WHEN ContactTitle != N'Owner' THEN CustomerID
-  END) AS NotRepresentedByOwner
-FROM Customers;
+    WHEN contact_title != 'Owner' THEN customer_id
+  END) AS not_represented_by_owner
+FROM customers;
 
 /*How many orders have been processed by employees in the WA region, and how many by employees in other regions? Show two columns with their respective counts: OrdersWAEmployees and OrdersNotWAEmployees.
 */
 
-SELECT
-COUNT( CASE WHEN REGION = N'WA' THEN OrderID END) AS OrdersWAEmployees,
-COUNT( CASE WHEN REGION != N'WA' THEN OrderID END) AS OrdersNotWAEmployees
-FROM Employees e
-JOIN Orders
-ON e.EmployeeID = Orders.EmployeeID
+SELECT 
+  COUNT(CASE
+    WHEN region = 'WA' THEN order_id
+  END) AS orders_wa_employees,
+  COUNT(CASE
+    WHEN region != 'WA' THEN order_id
+  END) AS orders_not_wa_employees
+FROM employees e
+JOIN orders o
+  ON e.employee_id = o.employee_id;
+                             
+                             
+/* We need a report that will show the number of products with high and low availability in all product categories. Show three columns:
+   category_name, high_availability (count the products with more than 30 units in stock) and low_availability (count the products with 30 or fewer units in stock).
+*/
+                             
+SELECT 
+  c.category_name,
+  COUNT(CASE
+    WHEN units_in_stock > 30 THEN product_id
+  END) AS high_availability,
+  COUNT(CASE
+    WHEN units_in_stock <= 30 THEN product_id
+  END) AS low_availability
+FROM products p
+JOIN categories c
+  ON p.category_id = c.category_id
+GROUP BY c.category_id,
+  c.category_name;
+                             
+                             
                              
                              
                              
