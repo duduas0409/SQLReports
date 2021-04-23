@@ -346,7 +346,7 @@ JOIN orders o
   ON e.employee_id = o.employee_id;
                              
                              
-/* We need a report that will show the number of products with high and low availability in all product categories. Show three columns:
+/* Create a report that will show the number of products with high and low availability in all product categories. Show three columns:
    category_name, high_availability (count the products with more than 30 units in stock) and low_availability (count the products with 30 or fewer units in stock).
 */
                              
@@ -363,6 +363,11 @@ JOIN categories c
   ON p.category_id = c.category_id
 GROUP BY c.category_id,
   c.category_name;
+									  
+                             
+                             
+									  
+
                              
                              
                              
