@@ -363,6 +363,29 @@ JOIN categories c
   ON p.category_id = c.category_id
 GROUP BY c.category_id,
   c.category_name;
+			     
+			   
+/* Create  a report that will show each supplier alongside their number of units in stock and their number of expensive units in stock. 
+Show four columns: supplier_id, company_name, all_units (all units in stock supplied by that supplier), and expensive_units (units in stock with 
+unit price over 40.0, supplied by that supplier). */
+			     
+			     
+SELECT 
+  s.supplier_id,
+  s.company_name,
+  SUM(units_in_stock) AS all_units,
+  SUM(CASE
+    WHEN unit_price > 40.0 THEN units_in_stock
+    ELSE 0
+  END) AS expensive_units
+FROM products p
+JOIN suppliers s
+  ON p.supplier_id = s.supplier_id
+GROUP BY s.supplier_id,
+  s.company_name;
+			     
+			     
+			     
 									  
                              
                              
