@@ -383,12 +383,50 @@ JOIN suppliers s
   ON p.supplier_id = s.supplier_id
 GROUP BY s.supplier_id,
   s.company_name;
+
+			     
+/*  categorize all orders based on their total price (before any discount). For each order, show the following columns:
+
+order_id
+total_price (calculated before discount)
+price_group, which should have the following values:
+'high' for a total price over $2,000.
+'average' for a total price between $600 and $2,000, both inclusive.
+'low' for a total price under $600. */
 			     
 			     
 			     
-									  
+SELECT
+  order_id,
+  SUM(unit_price * quantity) AS total_price,
+  CASE
+    WHEN SUM(unit_price * quantity) > 2000 THEN 'high'
+    WHEN SUM(unit_price * quantity) > 600 THEN 'average'
+    ELSE 'low'
+  END AS price_group
+FROM order_items
+GROUP BY order_id;
+			     
+			     
+/* Group all orders based on the freight column. Show three columns in your report:
+
+low_freight – the number of orders where the freight value is less than 40.0.
+avg_freight – the number of orders where the freight value is greater than equal to or 40.0 but less than 80.0.
+high_freight – the number of orders where the freight value is greater than equal to or 80.0. */
+			     
+SELECT
+  COUNT(CASE
+    WHEN freight >= 80.0 THEN order_id
+  END) AS high_freight,
+  COUNT(CASE
+    WHEN freight < 40.0 THEN order_id
+  END) AS low_freight,
+  COUNT(CASE
+    WHEN freight >= 40.0 AND freight < 80.0 THEN order_id
+  END) AS avg_freight
+FROM orders;			     
                              
-                             
+			     
 									  
 
                              
