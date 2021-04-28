@@ -553,14 +553,115 @@ GROUP BY e.employee_id,
   e.last_name;
 	
 	
+/* find the number of customers divided into three groups: those with fewer than 10 orders, those with 10–20 orders, and those with more than 20 orders */
 	
 	
+WITH customer_order_counts AS (
+  SELECT
+    customer_id, 
+    CASE
+      WHEN COUNT(o.order_id) > 20
+        THEN 'more than 20' 
+      WHEN COUNT(o.order_id) <= 20 AND COUNT(o.order_id) >= 10
+        THEN 'between 10 and 20'
+      ELSE 'less than 10'
+    END AS order_count_cat
+  FROM orders o
+  GROUP BY customer_id
+) 
+
+SELECT
+  order_count_cat,
+  COUNT(customer_id) AS customer_count
+FROM customer_order_counts
+GROUP BY order_count_cat;
+	
+	
+	
+/* Count the number of high value and low value customers. If the total price paid by a given customer for all their
+orders is more than $20,000 before discounts, treat the customer as 'high-value'. Otherwise, treat them as 'low-value'.
+
+Create a report with two columns: category (either 'high-value' or 'low-value') and customer_count.	*/
+	
+	
+	
+WITH customer_order_values AS (
+  SELECT
+    customer_id, 
+    CASE
+      WHEN SUM(quantity * unit_price) > 20000
+        THEN 'high-value' 
+      ELSE 'low-value'
+    END AS category
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  GROUP BY customer_id
+) 
+SELECT 
+  category,
+  COUNT(customer_id) AS customer_count
+FROM customer_order_values
+GROUP BY category;	
 	
 	
                              
                              
-
-
+/* What is the average number of products in non-vegetarian (category_id 6 or 8) and vegetarian categories (all other category_id values)? 
+Show two columns: product_type (either 'vegetarian' or 'non-vegetarian') and avg_product_count. */
+	
+	
+WITH product_counts AS (
+  SELECT 
+    category_id,
+    CASE
+      WHEN category_id IN (6, 8)
+        THEN 'non-vegetarian'
+      ELSE 'vegetarian'
+    END AS product_type, 
+    COUNT(*) AS product_count
+  FROM products 
+  GROUP BY category_id
+)
+SELECT
+  product_type,
+  AVG(product_count) AS avg_product_count
+FROM product_counts
+GROUP BY product_type;
+	
+	
+	
+	
+/* For each employee, calculate the average order value (after discount) and then
+show the minimum average (name the column minimal_average) and the maximum average (name the column maximal_average) values.	*/
+	
+	
+	
+WITH order_values AS (
+  SELECT
+    employee_id,
+    SUM(unit_price * quantity * (1 - discount)) AS total_discount_price
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  GROUP BY o.order_id, employee_id
+),
+customer_averages AS (
+  SELECT
+    employee_id,
+    AVG(total_discount_price) AS avg_discount_total_price
+  FROM order_values
+  GROUP BY employee_id
+)
+SELECT
+  MIN(avg_discount_total_price) AS minimal_average,
+  MAX(avg_discount_total_price) AS maximal_average
+FROM customer_averages;
+	
+	
+	
+	
+	
 
 
 
