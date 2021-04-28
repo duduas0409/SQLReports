@@ -520,6 +520,43 @@ FROM order_distinct_items
 GROUP BY ship_country
 ORDER BY avg_distinct_item_count DESC;	
 	
+	
+	
+	
+/*  For each employee, determine the average number of items they processed per order, for all orders placed in 2016. 
+The number of items in an order is defined as the sum of all quantities of all items in that order. 
+Show the following columns: first_name, last_name, and avg_item_count. */
+	
+	
+	
+WITH order_items_counts AS (
+  SELECT
+    o.order_id,
+    o.employee_id,
+    SUM(quantity) AS item_count
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  WHERE o.order_date >= '2016-01-01' AND o.order_date < '2017-01-01'
+  GROUP BY o.order_id,
+    o.employee_id
+)
+SELECT
+  e.first_name,
+  e.last_name,
+  AVG(item_count) AS avg_item_count 
+FROM order_items_counts oic
+JOIN employees e
+  ON oic.employee_id = e.employee_id
+GROUP BY e.employee_id,
+  e.first_name,
+  e.last_name;
+	
+	
+	
+	
+	
+	
                              
                              
 
