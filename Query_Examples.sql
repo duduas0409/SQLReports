@@ -425,13 +425,101 @@ SELECT
     WHEN freight >= 40.0 AND freight < 80.0 THEN order_id
   END) AS avg_freight
 FROM orders;			     
-                             
-			     
-									  
+ 
 
+/* Show the average total price paid (after discount) per order.	*/		     
+			     
+WITH order_discounted_prices AS (
+  SELECT
+    o.order_id, 
+    SUM(unit_price * quantity * (1 - discount)) AS total_discounted_price
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  GROUP BY o.order_id
+)
+SELECT
+  ROUND(AVG(total_discounted_price),2) AS avg_total_discounted_price
+FROM order_discounted_prices;
+	
+	
+	
+/*  find the average order value for each customer from Canada */
+	
+ WITH order_total_prices AS (
+  SELECT
+    o.order_id,
+    o.customer_id,
+    SUM(unit_price * quantity) AS total_price
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  GROUP BY o.order_id, o.customer_id
+)
+
+SELECT
+  c.customer_id,
+  c.company_name,
+  AVG(total_price) AS avg_total_price
+FROM order_total_prices OTP
+JOIN customers c
+  ON OTP.customer_id = c.customer_id
+WHERE c.country = 'Canada'
+GROUP BY c.customer_id, c.company_name;
+	
+	
+/* For each employee from the Washington (WA) region, show the average value for all orders they placed.
+ Show the following columns: employee_id, first_name, last_name, and avg_total_price (calculated as the
+ average total order price, before discount).  */
+	
+WITH order_total_prices AS (
+  SELECT
+    o.order_id,
+    o.employee_id,
+    SUM(unit_price * quantity) AS total_price
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  GROUP BY o.order_id,
+    o.employee_id
+)
+SELECT
+  e.employee_id,
+  e.first_name,
+  e.last_name,
+  AVG(total_price) AS avg_total_price
+FROM order_total_prices otp
+JOIN employees e
+  ON otp.employee_id = e.employee_id
+WHERE e.region = 'WA'
+GROUP BY e.employee_id,
+  e.first_name,
+  e.last_name;	
+	
                              
                              
-                             
+/* For each shipping country, we want to find the average count of unique products in each order. 
+Show the ship_country and avg_distinct_item_count columns. Sort the results by count, in descending order. */
+	
+	
+WITH order_distinct_items AS (
+  SELECT
+    o.order_id,
+    o.ship_country,
+    COUNT(distinct product_id) AS distinct_item_count
+  FROM orders o
+  JOIN order_items oi 
+    ON o.order_id = oi.order_id
+  GROUP BY o.order_id,
+    o.ship_country
+)
+SELECT
+  ship_country,
+  AVG(distinct_item_count) AS avg_distinct_item_count 
+FROM order_distinct_items
+GROUP BY ship_country
+ORDER BY avg_distinct_item_count DESC;	
+	
                              
                              
 
