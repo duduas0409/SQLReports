@@ -688,9 +688,49 @@ WHERE order_value > avg_order_value;
 	
 	
 	
+/* Find the average order value (after discount) for each customer. 
+	Show the customer_id and avg_discounted_price columns.	*/
+	
+	
+WITH order_values AS (
+  SELECT
+    customer_id,
+    oi.order_id,
+    SUM(unit_price * quantity * (1 - discount)) AS total_discounted_price
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  GROUP BY customer_id, oi.order_id
+)
+SELECT
+  customer_id,
+  AVG(total_discounted_price) AS avg_discounted_price
+FROM order_values
+GROUP BY customer_id;	
 	
 	
 	
+/* Create a report with two columns: price_category (which will contain either 'cheap' for 
+products with a maximum unit_price of 20.0 or 'expensive' otherwise) and avg_products_on_order 
+(the average number of units on order for a given price category).	 */
+	
+	
+	
+WITH product_info AS (
+  SELECT
+    product_id,
+    CASE
+      WHEN unit_price <= 20.0 THEN 'cheap'
+      ELSE 'expensive'
+    END AS price_category,
+      units_on_order
+  FROM products
+)
+SELECT
+  price_category,
+  AVG(units_on_order) AS avg_products_on_order
+FROM product_info
+GROUP By price_category;	
 
 
 
