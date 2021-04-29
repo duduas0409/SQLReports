@@ -660,6 +660,35 @@ FROM customer_averages;
 	
 	
 	
+/* Among orders shipped to Italy, show all orders that had an above-average total value (before discount).
+Show the order_id, order_value, and avg_order_value column. The avg_order_value column should show the same average order value for all rows.	*/
+	
+	
+WITH order_values AS (
+  SELECT
+    o.order_id,
+    SUM(quantity * unit_price) AS order_value
+  FROM orders o
+  JOIN order_items oi
+    ON o.order_id = oi.order_id
+  WHERE ship_country = 'Italy'
+  GROUP BY o.order_id
+),
+avg_order_value AS (
+  SELECT
+    AVG(order_value) AS avg_order_value
+  FROM order_values
+)
+SELECT
+  order_id,
+  order_value,
+  avg_order_value
+FROM order_values, avg_order_value
+WHERE order_value > avg_order_value;
+	
+	
+	
+	
 	
 	
 
