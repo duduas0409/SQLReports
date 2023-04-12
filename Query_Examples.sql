@@ -1,5 +1,5 @@
 /* 2 sample Microsoft db describes a fictional store and
-   its employees, customers, suppliers, products and orders
+   its employees, customers, suppliers, products and orders   
 
 
 Employees table:
