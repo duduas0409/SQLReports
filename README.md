@@ -10,7 +10,8 @@ Products contains information about the products sold.
 Categories contains information about product categories.
 Suppliers contains information about the companies that supply products.
 Orders contains general information about orders made by Northwind's customers.
-OrderItems contains information about the individual items in each customer order.
+OrderItems contains information about the individual items in each customer order
+
 
 
 
